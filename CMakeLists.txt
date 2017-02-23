@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 project(Common CXX)
 
+option(build_tests "build tests" OFF)
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 11)
 
@@ -11,7 +13,7 @@ conan_basic_setup()
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
 set(
-  common_sources
+  library_sources
     src/DataSizeRepresentation.cpp
     src/PublicKey.cpp
     src/PrivateKey.cpp
@@ -45,4 +47,20 @@ set(
     src/RelativeLockTime.cpp
 )
 
-add_library(common ${common_sources})
+# === build library ===
+add_library(common ${library_sources})
+
+# === build tests ===
+if(build_tests)
+  file(GLOB tests RELATIVE "${PROJECT_SOURCE_DIR}" "test/test_*.cpp")
+
+  enable_testing()
+
+  foreach(s ${tests})
+    get_filename_component (sn ${s} NAME_WE)
+    add_executable(${sn} ${s})
+    target_link_libraries(${sn} common ${CONAN_LIBS})
+    add_test(${sn} "bin/${sn}")
+  endforeach(s)
+
+endif()
