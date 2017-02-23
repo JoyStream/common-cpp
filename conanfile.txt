@@ -1,0 +1,5 @@
+[requires]
+CoinCore/0.1@mokhtar/stable
+
+[generators]
+cmake
