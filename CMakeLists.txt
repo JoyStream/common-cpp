@@ -14,7 +14,6 @@ include_directories("${CMAKE_SOURCE_DIR}/include")
 
 set(
   library_sources
-    src/DataSizeRepresentation.cpp
     src/PublicKey.cpp
     src/PrivateKey.cpp
     src/Base58CheckEncodable.cpp
@@ -52,7 +51,7 @@ add_library(common ${library_sources})
 
 # === build tests ===
 if(build_tests)
-  file(GLOB tests RELATIVE "${PROJECT_SOURCE_DIR}" "test/test_*.cpp")
+  file(GLOB tests RELATIVE "${CMAKE_SOURCE_DIR}" "test/test_*.cpp")
 
   enable_testing()
 
