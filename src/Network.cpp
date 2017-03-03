@@ -6,7 +6,8 @@
  */
 
 #include <common/Network.hpp>
-
+#include <string>
+#include <stdexcept>
 #include <string.h> // strcmp
 #include <cassert>
 
@@ -22,6 +23,7 @@ const char * nameFromNetwork(Network network) {
             assert(false);
     }
 
+    return "";
 }
 
 Network networkFromName(const char * name) {
@@ -33,7 +35,7 @@ Network networkFromName(const char * name) {
     else if(strcmp(name, "regtest") == 0)
         return Network::regtest;
     else
-        assert(false);
+        throw std::runtime_error(std::string("network name unknown: ") + name);
 
 }
 

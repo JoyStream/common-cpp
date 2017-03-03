@@ -49,8 +49,11 @@ uint32_t toVersionValue(Base58CheckEncodable encodable, Network network) {
                 assert(false);
         }
 
-    } else
-        assert(false);
+    }
+
+    assert(false);
+
+    return -1;
 }
 
 std::vector<unsigned char> toVersionBytes(Base58CheckEncodable encodable, Network network) {
