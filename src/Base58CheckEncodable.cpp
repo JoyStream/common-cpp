@@ -51,9 +51,10 @@ uint32_t toVersionValue(Base58CheckEncodable encodable, Network network) {
 
     }
 
-    assert(false);
-
-    return -1;
+    // Not the best approach - the function should return a variant instead
+    // to indicate that a value was not determined for the combination
+    // of Base58CheckEncodable and network type
+    throw std::runtime_error("unable to determine version value");
 }
 
 std::vector<unsigned char> toVersionBytes(Base58CheckEncodable encodable, Network network) {
