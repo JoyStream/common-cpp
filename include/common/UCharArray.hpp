@@ -202,9 +202,9 @@ std::ostream & operator<<(std::ostream& stream, const Coin::UCharArray<array_len
     // Get position of pointer after writing to stream
     auto after = stream.tellp();
 
-    if(after != -1 && before != -1)
-        bytesWritten = after - before;
-    else bytesWritten = -1;
+    if(after == std::streamoff(-1) || before == std::streamoff(-1))
+        bytesWritten = -1;
+    else bytesWritten = after - before;
 
     if(bytesWritten != array_length) {
 

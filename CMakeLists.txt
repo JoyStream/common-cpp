@@ -24,7 +24,6 @@ set(
     src/UnspentP2SHOutput.cpp
     src/UnspentP2PKHOutput.cpp
     src/Utilities.cpp
-    src/TimeTools.cpp
     src/typesafeOutPoint.cpp
     src/P2SHAddress.cpp
     src/Seed.cpp
