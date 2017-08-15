@@ -1,32 +1,42 @@
-from conans import ConanFile, CMake, tools
 import os
+import shutil
+from distutils.dir_util import copy_tree
+from base import CommonBase
 
-class Common(ConanFile):
-    name = "Common"
-    version = "0.1"
-    license = '(c) JoyStream Inc. 2016-2017'
-    url = "https://github.com/JoyStream/common-conan.git"
-    source_url = "git@github.com:JoyStream/common-cpp.git"
-    settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake"
-    requires = "CoinCore/0.1@joystream/stable"
+# The reason the local package is named conanfile.py and not testing.py is to we can run
+# the test_pacakge command (it doesn't accept a --filename arg)
+# This way the "default mode" of working with the pacakges is with the testing channels
+
+# By default conan export uses the testing channel if not specified so it is also convenient to just run
+# `conan export joystream` for local development
+
+LOCAL_REPO_PATH_ENV = "COMMON_LOCAL_REPO_PATH"
+
+class CommonTesting(CommonBase):
+    # No real version is defined when working with a package on the testing channel
+    # Keep at at 0.0.0 to detect accidentally exporting to stable branch
+    # It would be nice to have a method that conan calls when the recipie is being exported
+    version = "0.0.0"
+
+    exports = "base.py"
+
+    exports_sources = "../sources*"
+
+    # override base policy
+    build_policy="always"
 
     def source(self):
-        self.run("git clone %s" % self.source_url)
-        self.run("cd common-cpp && git checkout master")
+        repo_path = os.getenv(LOCAL_REPO_PATH_ENV)
 
-    def build(self):
-        cmake = CMake(self.settings)
-        self.run('cmake common-cpp %s' % (cmake.command_line))
-        self.run("cmake --build . %s" % cmake.build_config)
+        if (repo_path):
+            os.makedirs("repo/sources")
+            copy_tree("%s/sources" % repo_path, "repo/sources")
+        else:
+            os.mkdir("repo")
+            shutil.move("sources", "repo/")
 
-    def package(self):
-        self.copy("*.hpp", dst="include", src="common-cpp/include/")
-        self.copy("*.a", dst="lib", keep_path=False)
-        self.copy("*.lib", dst="lib", keep_path=False)
+    def requirements(self):
+        self.requires("gtest/1.8.0@lasote/stable")
 
-    def package_info(self):
-        self.cpp_info.libs = ["common"]
-
-        if str(self.settings.compiler) != "Visual Studio":
-            self.cpp_info.cppflags.append("-std=c++11")
+    def configure(self):
+        self.options["gtest"].shared=False

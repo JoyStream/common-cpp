@@ -1,14 +1,9 @@
 from conans import ConanFile, CMake
 import os
 
-
-channel = os.getenv("CONAN_CHANNEL", "stable")
-username = os.getenv("CONAN_USERNAME", "joystream")
-
-
 class CoincoreTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    requires = "Common/0.1@%s/%s" % (username, channel)
+    requires = "Common/0.0.0@%s/%s" % ("joystream", "testing")
     generators = "cmake"
 
     def build(self):
