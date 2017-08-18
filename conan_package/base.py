@@ -11,7 +11,7 @@ class CommonBase(ConanFile):
     build_policy = "missing"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
-    requires = "CoinCore/0.1@joystream/stable"
+    requires = "CoinCore/0.1.1@joystream/stable"
 
     def source(self):
         raise Exception("abstract base package was exported")
