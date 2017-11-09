@@ -3,7 +3,7 @@
 
 Common crypto C++ library building on [CoinCore](https://github.com/JoyStream/coincore-cpp)
 
-Current published release: `Common/0.1.1@joystream/stable`
+conan package name: `Common/0.1.2@joystream/stable`
 
 ### Dependencies
 
@@ -46,6 +46,7 @@ bin/example
 sh run_tests.sh
 ```
 
-## License & Copyright
+## License
 
-`...add later...`
+JoyStream Common library is released under the terms of the MIT license.
+See [LICENSE](LICENCE) for more information.
