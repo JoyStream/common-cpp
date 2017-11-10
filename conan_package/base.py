@@ -3,9 +3,10 @@ import os
 
 class CommonBase(ConanFile):
     name = "Common"
-    version = "0.1.1" # should match the git tag without the 'v' preifx
-    git_repo = "git@github.com:JoyStream/common-cpp.git"
+    version = "0.1.2" # should match the git tag without the 'v' preifx
     url = "https://github.com/JoyStream/common-cpp.git"
+    repo_https_url = "https://github.com/JoyStream/common-cpp.git"
+    repo_ssh_url ="git@github.com:JoyStream/common-cpp.git"
     license = '(c) JoyStream Inc. 2016-2017'
 
     build_policy = "missing"
