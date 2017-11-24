@@ -6,8 +6,11 @@
  */
 
 #include <common/SigHashType.hpp>
+#include <CoinCore/CoinNodeData.h> //Coin::HashType
 
 #include <stdexcept>
+
+#define SIGHASHTYPE_BITMASK 0x1f
 
 namespace Coin {
 
@@ -44,7 +47,7 @@ SigHashType SigHashType::fromHashCode(uint32_t hashCode) {
 }
 
 bool SigHashType::canAnyonePay(uint32_t hashCode) {
-    return hashCode & SIGHASH_ANYONECANPAY;
+    return hashCode & HashType::SIGHASH_ANYONECANPAY;
 }
 
 SigHashType SigHashType::standard() {
@@ -59,9 +62,9 @@ unsigned char SigHashType::flag(MutuallyExclusiveType type) {
 
     switch(type) {
 
-        case MutuallyExclusiveType::all: return SIGHASH_ALL;
-        case MutuallyExclusiveType::none: return SIGHASH_NONE;
-        case MutuallyExclusiveType::single: return SIGHASH_SINGLE;
+        case MutuallyExclusiveType::all: return HashType::SIGHASH_ALL;
+        case MutuallyExclusiveType::none: return HashType::SIGHASH_NONE;
+        case MutuallyExclusiveType::single: return HashType::SIGHASH_SINGLE;
 
         default:
             throw std::runtime_error("Coding error, unsupported MutuallyExclusiveType");
@@ -69,7 +72,7 @@ unsigned char SigHashType::flag(MutuallyExclusiveType type) {
 }
 
 unsigned char SigHashType::hashCode() const {
-    return flag(_type) | ( _anyOneCanPay ? SIGHASH_ANYONECANPAY : 0);
+    return flag(_type) | ( _anyOneCanPay ? HashType::SIGHASH_ANYONECANPAY : 0);
 }
 
 SigHashType::MutuallyExclusiveType SigHashType::type() const {

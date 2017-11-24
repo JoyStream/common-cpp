@@ -12,13 +12,6 @@
 
 namespace Coin {
 
-#define SIGHASHTYPE_BITMASK 0x1f
-
-#define SIGHASH_ALL 0x01
-#define SIGHASH_NONE 0x02
-#define SIGHASH_SINGLE 0x03
-#define SIGHASH_ANYONECANPAY 0x80
-
 class SigHashType {
 
 public:
