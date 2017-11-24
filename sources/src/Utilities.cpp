@@ -247,6 +247,7 @@ namespace Coin {
     }
     */
 
+    // Old Sighash for non-segwit transactions
     uchar_vector sighash(const Transaction &tx,
                          uint inputIndex,
                          const uchar_vector &subscript,
@@ -258,6 +259,11 @@ namespace Coin {
 
         if(inputIndex >= tx.inputs.size()) {
             throw std::runtime_error("sighash: input index out of range");
+        }
+
+        // Should not be calling this function for segwit transactions!
+        if (!tx.inputs[inputIndex].scriptWitness.isEmpty()) {
+           throw std::runtime_error("sighash: old sighash can not be used for segwit transactions");
         }
 
         // Make a copy of the transaction
@@ -290,6 +296,7 @@ namespace Coin {
         return txCopy.getHashWithAppendedCode(sigHashType.hashCode());
     }
 
+    // Old Sighash for non-segwit transactions
     uchar_vector sighash(const Coin::Transaction & tx,
                     const typesafeOutPoint &outPoint,
                     const uchar_vector & subscript,
