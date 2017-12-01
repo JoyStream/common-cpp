@@ -14,9 +14,15 @@ namespace Coin {
  * Bitcoin network
  */
 enum class Network {
+    // Bitcoin
     testnet3,
     mainnet,
-    regtest
+    regtest,
+
+    // Bitcoin Cash
+    testnet_bitcoin_cash,
+    mainnet_bitcoin_cash,
+    regtest_bitcoin_cash
 };
 
 /**
@@ -29,4 +35,3 @@ Network networkFromName(const char * name);
 }
 
 #endif // COIN_NETWORK_HPP
-
