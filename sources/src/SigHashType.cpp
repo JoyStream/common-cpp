@@ -10,6 +10,7 @@
 #include <CoinCore/numericdata.h>
 
 #include <stdexcept>
+#include <cassert>
 
 // SIGHASHTYPE_BITMASK defines the number of bits of the hash type which is used
 // to identify which outputs are signed.
