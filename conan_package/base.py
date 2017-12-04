@@ -3,7 +3,7 @@ import os
 
 class CommonBase(ConanFile):
     name = "Common"
-    version = "0.1.3" # should match the git tag without the 'v' preifx
+    version = "0.2.0" # should match the git tag without the 'v' preifx
     url = "https://github.com/JoyStream/common-cpp.git"
     repo_https_url = "https://github.com/JoyStream/common-cpp.git"
     repo_ssh_url ="git@github.com:JoyStream/common-cpp.git"
@@ -12,7 +12,7 @@ class CommonBase(ConanFile):
     build_policy = "missing"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
-    requires = "CoinCore/0.1.2@joystream/stable"
+    requires = "CoinCore/0.2.0@joystream/stable"
 
     def source(self):
         raise Exception("abstract base package was exported")
