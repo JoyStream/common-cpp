@@ -104,7 +104,7 @@ namespace Coin {
             case Network::mainnet: return mainnetAddressVersions;
             case Network::regtest: return testnet3AddressVersions;
             default:
-                    assert(false);
+                    throw std::runtime_error("unsupported network");
         }
     }
 

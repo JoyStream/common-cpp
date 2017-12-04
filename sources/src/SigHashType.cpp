@@ -18,11 +18,12 @@
 
 namespace Coin {
 
-SigHashType::SigHashType()
-    : _type(MutuallyExclusiveType::all)
-    , _anyOneCanPay(false)
-    , _chain(ChainType::bitcoin) {
-}
+// Not including a default constructor to make sure network is always explicitly set
+// SigHashType::SigHashType()
+//     : _type(MutuallyExclusiveType::all)
+//     , _anyOneCanPay(false)
+//     , _chain(ChainType::bitcoin) {
+// }
 
 SigHashType::SigHashType(MutuallyExclusiveType type, bool anyOneCanPay, Network network)
     : _type(type)

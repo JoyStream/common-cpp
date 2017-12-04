@@ -28,9 +28,9 @@ public:
         single
     };
 
-    SigHashType();
+    //SigHashType();
 
-    SigHashType(MutuallyExclusiveType type, bool anyOneCanPay, Network network = Network::mainnet);
+    SigHashType(MutuallyExclusiveType type, bool anyOneCanPay, Network network);
 
     bool operator==(const SigHashType & rhs);
 
@@ -41,7 +41,7 @@ public:
     static bool canAnyonePay(uint32_t hashCode);
 
     // Returns type all and !anyonecanpay
-    static SigHashType standard(Network network = Network::mainnet);
+    static SigHashType standard(Network network);
 
     // Is of type all and !anyonecanpay
     bool isStandard() const;
