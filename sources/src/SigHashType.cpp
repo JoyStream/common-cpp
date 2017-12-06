@@ -108,20 +108,9 @@ uint32_t SigHashType::hashCode() const {
 uchar_vector SigHashType::hashCodeForScript() const {
   uchar_vector codeForScript;
 
-  if(_chain == ChainType::bitcoin) {
-    // 1-byte for Bitcoin, Litecoin
-    unsigned char code = hashCode();
-    codeForScript.push_back(code);
-    return codeForScript;
-  }
-
-  if(_chain == ChainType::cash) {
-    // 4-bytes for Bitcoin Cash
-    codeForScript += uint_to_vch(hashCode(), LITTLE_ENDIAN_);
-    return codeForScript;
-  }
-
-  throw std::runtime_error("unsupported chain type");
+  unsigned char code = hashCode() & 0x000000ff;
+  codeForScript.push_back(code);
+  return codeForScript;
 }
 
 SigHashType::MutuallyExclusiveType SigHashType::type() const {
