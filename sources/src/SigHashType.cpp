@@ -190,13 +190,13 @@ uchar_vector SigHashType::getSigHash(const Transaction &tx,
         return tx.getSigHash(hashCode(), inputIndex, subscript, value);
       } else {
         // Bitcoin non-segwit
-        return sighash_bitcoin_old(tx, inputIndex, subscript);
+        return sighash_bitcoin_old(tx, inputIndex, subscript, hashCode());
       }
     }
 
     // Bitcoin Cash
     if (ChainType::cash == _chain) {
-      return sighash_bitcoin_cash(tx, inputIndex, subscript, value);
+      return sighash_bitcoin_cash(tx, inputIndex, subscript, hashCode(), value);
     }
 
     throw std::runtime_error("sighash: unsupported chain type");
@@ -218,18 +218,21 @@ uchar_vector SigHashType::getSigHash(const Coin::Transaction & tx,
 }
 
 // Old Sighash for bitcoin non-segwit transactions
-uchar_vector SigHashType::sighash_bitcoin_old(const Transaction &tx,
+uchar_vector sighash_bitcoin_old(const Transaction &tx,
                      uint inputIndex,
-                     const uchar_vector &subscript) const {
+                     const uchar_vector &subscript,
+                     uint32_t hashcode) {
 
-    assert(_chain == SigHashType::ChainType::bitcoin);
+    if (hashcode & HashType::SIGHASH_FORKID)
+      throw std::runtime_error("cannot set forkid flag for bitcoin sighash");
 
     // Should not be calling this function for segwit transactions!
-    assert(tx.inputs[inputIndex].scriptWitness.isEmpty());
+    if(!tx.inputs[inputIndex].scriptWitness.isEmpty())
+      throw std::runtime_error("this sighash cannot be used for segwit transactions");
 
     // We only support this for now
-    if(_type != SigHashType::MutuallyExclusiveType::all)
-        throw std::runtime_error("unsupported sighash type, only sighash_all is supported");
+    if((hashcode & SIGHASHTYPE_BITMASK) != HashType::SIGHASH_ALL)
+        throw std::runtime_error("unsupported sighash type, only SIGHASH_ALL is supported");
 
     if(inputIndex >= tx.inputs.size()) {
         throw std::runtime_error("sighash: input index out of range");
@@ -238,7 +241,7 @@ uchar_vector SigHashType::sighash_bitcoin_old(const Transaction &tx,
     // Make a copy of the transaction
     Coin::Transaction txCopy = tx;
 
-    if(_anyOneCanPay) {
+    if(hashcode & HashType::SIGHASH_ANYONECANPAY) {
         // Sign only one input
         // https://en.bitcoin.it/wiki/OP_CHECKSIG#Procedure_for_Hashtype_SIGHASH_ANYONECANPAY
 
@@ -262,23 +265,22 @@ uchar_vector SigHashType::sighash_bitcoin_old(const Transaction &tx,
     }
 
     // Compute sighash
-    return txCopy.getHashWithAppendedCode(hashCode());
+    return txCopy.getHashWithAppendedCode(hashcode); // should this be reversed ?
 }
 
 // Bitcoin Cash sighash algorithm
-uchar_vector SigHashType::sighash_bitcoin_cash(const Transaction &tx,
+uchar_vector sighash_bitcoin_cash(const Transaction &tx,
                      uint inputIndex,
                      const uchar_vector &subscript,
-                     uint64_t value) const {
+                     uint32_t hashcode,
+                     uint64_t value) {
 
-     assert(_chain == SigHashType::ChainType::cash);
+     if (!(hashcode & HashType::SIGHASH_FORKID))
+       throw std::runtime_error("forkid flag not set for bitcoin cash sighash");
 
      // Should not be calling this function for segwit transactions!
-     assert(tx.inputs[inputIndex].scriptWitness.isEmpty());
-
-     // We only support this for now
-     if(_type != SigHashType::MutuallyExclusiveType::all)
-         throw std::runtime_error("unsupported sighash type, only sighash_all is supported");
+     if(!tx.inputs[inputIndex].scriptWitness.isEmpty())
+       throw std::runtime_error("this sighash cannot be used for segwit transactions");
 
      if(inputIndex >= tx.inputs.size()) {
          throw std::runtime_error("sighash: input index out of range");
@@ -288,26 +290,36 @@ uchar_vector SigHashType::sighash_bitcoin_cash(const Transaction &tx,
      uchar_vector hashSequence;
      uchar_vector hashOutputs;
 
-     if(!_anyOneCanPay) {
+     if(!(hashcode & HashType::SIGHASH_ANYONECANPAY)) {
          uchar_vector ss;
          for (auto& input: tx.inputs) { ss += input.previousOut.getSerialized(); }
          hashPrevouts = sha256_2(ss);
      } else {
-         hashPrevouts = uchar_vector(32, 0); //uint256 of 0x0000......0000
+         hashPrevouts = uchar_vector(32); //uint256 of 0x0000......0000
      }
 
-     if(!_anyOneCanPay) {
+     if(!(hashcode & HashType::SIGHASH_ANYONECANPAY) &&
+        (hashcode & SIGHASHTYPE_BITMASK) != HashType::SIGHASH_SINGLE &&
+        (hashcode & SIGHASHTYPE_BITMASK) != HashType::SIGHASH_NONE) {
          uchar_vector ss;
          for (auto& input: tx.inputs) { ss += uint_to_vch(input.sequence, LITTLE_ENDIAN_); }
          hashSequence = sha256_2(ss);
      } else {
-         hashPrevouts = uchar_vector(32, 0); //uint256 of 0x0000......0000
+         hashSequence = uchar_vector(32); //uint256 of 0x0000......0000
      }
 
-     {
+     if((hashcode & SIGHASHTYPE_BITMASK) != HashType::SIGHASH_SINGLE &&
+        (hashcode & SIGHASHTYPE_BITMASK) != HashType::SIGHASH_NONE) {
          uchar_vector ss;
          for (auto& output: tx.outputs) { ss += output.getSerialized(); }
          hashOutputs = sha256_2(ss);
+     } else if((hashcode & SIGHASHTYPE_BITMASK) == HashType::SIGHASH_SINGLE &&
+                inputIndex < tx.outputs.size()){
+        uchar_vector ss;
+        ss += tx.outputs[inputIndex].getSerialized();
+        hashOutputs = sha256_2(ss);
+     } else {
+        hashOutputs = uchar_vector(32); //uint256 of 0x0000......0000
      }
 
      uchar_vector ss;
@@ -321,8 +333,7 @@ uchar_vector SigHashType::sighash_bitcoin_cash(const Transaction &tx,
      ss += uint_to_vch(tx.inputs[inputIndex].sequence, LITTLE_ENDIAN_);
      ss += hashOutputs;
      ss += uint_to_vch(tx.lockTime, LITTLE_ENDIAN_);
-
-     ss += uint_to_vch(hashCode(), LITTLE_ENDIAN_);
+     ss += uint_to_vch(hashcode, LITTLE_ENDIAN_);
 
      return sha256_2(ss);
 }

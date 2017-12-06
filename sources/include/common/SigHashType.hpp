@@ -17,6 +17,20 @@
 
 namespace Coin {
 
+  // Old (non-segwit) Bitcoin sighash
+  uchar_vector sighash_bitcoin_old(const Coin::Transaction & tx,
+                                   uint inputIndex,
+                                   const uchar_vector & subscript,
+                                   uint32_t hashcode);
+
+  // Bitcoin Cash sighash algorithm - revised BIP143 to account for non-Segwit deployment.
+  // see https://github.com/Bitcoin-UAHF/spec/blob/master/replay-protected-sighash.md for details
+  uchar_vector sighash_bitcoin_cash(const Coin::Transaction & tx,
+                                    uint inputIndex,
+                                    const uchar_vector & subscript,
+                                    uint32_t hashcode,
+                                    uint64_t value);
+
 class SigHashType {
 
 public:
@@ -27,8 +41,6 @@ public:
         none,
         single
     };
-
-    //SigHashType();
 
     SigHashType(MutuallyExclusiveType type, bool anyOneCanPay, Network network);
 
@@ -95,18 +107,6 @@ private:
     bool _anyOneCanPay;
 
     ChainType chainType() const;
-
-    // Old (non-segwit) Bitcoin sighash
-    uchar_vector sighash_bitcoin_old(const Coin::Transaction & tx,
-                    uint inputIndex,
-                    const uchar_vector & subscript) const;
-
-    // Bitcoin Cash sighash algorithm - revised BIP143 to account for non-Segwit deployment.
-    // see https://github.com/Bitcoin-UAHF/spec/blob/master/replay-protected-sighash.md for details
-    uchar_vector sighash_bitcoin_cash(const Coin::Transaction & tx,
-                    uint inputIndex,
-                    const uchar_vector & subscript,
-                    uint64_t value) const;
 };
 
 }
