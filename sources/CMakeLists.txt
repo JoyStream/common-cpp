@@ -50,15 +50,16 @@ add_library(common ${library_sources})
 
 # === build tests ===
 if(build_tests)
-  file(GLOB tests RELATIVE "${CMAKE_SOURCE_DIR}" "test/test_*.cpp")
-
   enable_testing()
 
-  foreach(s ${tests})
-    get_filename_component (sn ${s} NAME_WE)
-    add_executable(${sn} ${s})
-    target_link_libraries(${sn} common ${CONAN_LIBS})
-    add_test(${sn} "bin/${sn}")
-  endforeach(s)
+  # Main unit tests
+  add_executable(test_main "${CMAKE_CURRENT_LIST_DIR}/test/test_main.cpp")
+  target_link_libraries(test_main common ${CONAN_LIBS})
+  add_test(MainTests "bin/test_main")
+
+  # Bitcoin Cash sighash type unit tests
+  add_executable(test_bcash_sighash "${CMAKE_CURRENT_LIST_DIR}/test/test_bcash_sighash.cpp")
+  target_link_libraries(test_bcash_sighash common ${CONAN_LIBS})
+  add_test(BitcoinCash_SigHash_Tests "bin/test_bcash_sighash" "${CMAKE_CURRENT_LIST_DIR}/test/data/sighash.json")
 
 endif()
