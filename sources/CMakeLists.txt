@@ -57,9 +57,9 @@ if(build_tests)
   target_link_libraries(test_main common ${CONAN_LIBS})
   add_test(MainTests "bin/test_main")
 
-  # Bitcoin Cash sighash type unit tests
-  add_executable(test_bcash_sighash "${CMAKE_CURRENT_LIST_DIR}/test/test_bcash_sighash.cpp")
-  target_link_libraries(test_bcash_sighash common ${CONAN_LIBS})
-  add_test(BitcoinCash_SigHash_Tests "bin/test_bcash_sighash" "${CMAKE_CURRENT_LIST_DIR}/test/data/sighash.json")
+  # sighash unit tests
+  add_executable(test_sighash "${CMAKE_CURRENT_LIST_DIR}/test/test_sighash.cpp")
+  target_link_libraries(test_sighash common ${CONAN_LIBS})
+  add_test(SigHash_Tests "bin/test_sighash" "${CMAKE_CURRENT_LIST_DIR}/test/data/sighash.json")
 
 endif()

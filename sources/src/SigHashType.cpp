@@ -6,6 +6,7 @@
  */
 
 #include <common/SigHashType.hpp>
+#include <common/Utilities.hpp>
 #include <CoinCore/CoinNodeData.h> //Coin::HashType
 #include <CoinCore/numericdata.h>
 
@@ -15,6 +16,8 @@
 // SIGHASHTYPE_BITMASK defines the number of bits of the hash type which is used
 // to identify which outputs are signed.
 #define SIGHASHTYPE_BITMASK 0x1f
+
+#define SIGHASH_SINGLE_BUG "0000000000000000000000000000000000000000000000000000000000000001"
 
 namespace Coin {
 
@@ -219,16 +222,51 @@ uchar_vector sighash_bitcoin_old(const Transaction &tx,
     if(!tx.inputs[inputIndex].scriptWitness.isEmpty())
       throw std::runtime_error("this sighash cannot be used for segwit transactions");
 
-    // We only support this for now
-    if((hashcode & SIGHASHTYPE_BITMASK) != HashType::SIGHASH_ALL)
-        throw std::runtime_error("unsupported sighash type, only SIGHASH_ALL is supported");
-
     if(inputIndex >= tx.inputs.size()) {
         throw std::runtime_error("sighash: input index out of range");
     }
 
     // Make a copy of the transaction
     Coin::Transaction txCopy = tx;
+
+    // Clear all inputs scripts
+    txCopy.clearScriptSigs();
+
+    //TODO: must remove code separators:
+    // uchar_vector subscript_cleared = removeCodeSeparators(subscript);
+    uchar_vector subscript_cleared = subscript;
+
+    // Set script sig to subscript for signature (must have code separators removed)
+    txCopy.inputs[inputIndex].scriptSig = subscript_cleared;
+
+    if((hashcode & SIGHASHTYPE_BITMASK) == HashType::SIGHASH_SINGLE ||
+       (hashcode & SIGHASHTYPE_BITMASK) == HashType::SIGHASH_NONE) {
+        // clear sequence numbers
+        for (int i = 0; i < txCopy.inputs.size(); i++) {
+          if (inputIndex != i) {
+            txCopy.inputs[i].sequence = 0;
+          }
+        }
+    }
+
+    if((hashcode & SIGHASHTYPE_BITMASK) == HashType::SIGHASH_NONE) {
+      // Remove all outputs
+      txCopy.outputs.clear();
+
+    } else if ((hashcode & SIGHASHTYPE_BITMASK) == HashType::SIGHASH_SINGLE) {
+      // The SIGHASH_SINGLE bug.
+      // https://bitcointalk.org/index.php?topic=260595.0
+      if (inputIndex >= txCopy.outputs.size()) {
+        return uchar_vector(SIGHASH_SINGLE_BUG);
+      }
+
+      txCopy.outputs.resize(inputIndex + 1);
+
+      for (int i = 0; i < inputIndex; i++) {
+        txCopy.outputs[i].value = 0xffffffffffffffff; // (long) -1
+        txCopy.outputs[i].scriptPubKey = uchar_vector(); // empty script
+      }
+    }
 
     if(hashcode & HashType::SIGHASH_ANYONECANPAY) {
         // Sign only one input
@@ -241,20 +279,11 @@ uchar_vector sighash_bitcoin_old(const Transaction &tx,
         txCopy.inputs.push_back(tx.inputs[inputIndex]);
 
         // Set script sig to subscript for signature
-        txCopy.inputs[0].scriptSig = subscript;
-
-    } else {
-        // Sign all inputs
-
-        // Clear all inputs scripts
-        txCopy.clearScriptSigs();
-
-        // Set script sig to subscript for signature
-        txCopy.inputs[inputIndex].scriptSig = subscript;
+        txCopy.inputs[0].scriptSig = subscript_cleared;
     }
 
     // Compute sighash
-    return txCopy.getHashWithAppendedCode(hashcode); // should this be reversed ?
+    return txCopy.getHashWithAppendedCode(hashcode);
 }
 
 // Bitcoin Cash sighash algorithm

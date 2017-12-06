@@ -10,6 +10,7 @@
 
 #include <common/Base58CheckEncodable.hpp> // version macroes
 #include <common/AddressType.hpp>
+#include <CoinCore/CoinNodeData.h>
 #include <stdutils/uchar_vector.h>
 #include <CoinCore/numericdata.h>
 #include <string>
@@ -63,19 +64,13 @@ namespace Coin {
 
     uchar_vector popData(const uchar_vector & script, uchar_vector & poppedData);
 
+    uchar_vector removeCodeSeparators(const uchar_vector& script);
+
     // Deduce address network
     //Network getNetwork(std::string & base58CheckEncodedAddress);
 
     // Deduce address type
     //AddressType getType(std::string & base58CheckEncodedAddress);
-
-}
-
-
-
-#include <CoinCore/CoinNodeData.h>
-
-namespace Coin {
 
     // Turns into raw: OP_0 ...signatures...
     // which is used for both p2sh and regular mofn scriptSig

@@ -202,7 +202,7 @@ namespace Coin {
             offset = 5;
         }
         // OP_1 ... OP_16
-        else if(script[0] >= 0x51 || script[0] <= 0x60) {
+        else if(script[0] >= 0x51 && script[0] <= 0x60) {
             offset = 1;
             poppedData = uchar_vector(1, script[0] - 0x51 + 1);
         }else{
@@ -320,4 +320,10 @@ namespace Coin {
 
         return result;
     }
+
+    // TODO: implement this: https://en.bitcoin.it/wiki/OP_CHECKSIG#How_it_works
+    uchar_vector removeCodeSeparators(const uchar_vector& script) {
+       throw std::runtime_error("not implemented");
+    }
+
 }
