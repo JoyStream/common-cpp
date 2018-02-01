@@ -55,6 +55,14 @@ namespace common {
             return std::to_string(_major) + "." + std::to_string(_minor);
         }
 
+        unsigned int major() const {
+          return _major;
+        }
+
+        unsigned int minor() const {
+          return _minor;
+        }
+
     private:
 
         unsigned int _major;
