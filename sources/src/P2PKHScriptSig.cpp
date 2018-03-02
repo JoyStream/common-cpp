@@ -15,9 +15,9 @@ P2PKHScriptSig::P2PKHScriptSig(const PublicKey & pk, const TransactionSignature 
     , _ts(ts) {
 }
 
-uint32_t P2PKHScriptSig::maxLength() {
-    return P2PKHScriptSig(PublicKey(), TransactionSignature(Signature(), SigHashType())).serialized().size();
-}
+// uint32_t P2PKHScriptSig::maxLength() {
+//     return P2PKHScriptSig(PublicKey(), TransactionSignature(Signature(), SigHashType())).serialized().size();
+// }
 
 uchar_vector P2PKHScriptSig::serialized() const {
 

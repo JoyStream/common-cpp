@@ -266,7 +266,7 @@ TEST(commonTest, P2PKHScriptSig)
     uchar_vector rawPk("030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc");
     uchar_vector rawSig("3045022100d5e61ab5bfd0d1450997894cb1a53e917f89d82eb43f06fa96f32c96e061aec102202fc1188e8b0dc553a2588be2b5b68dbbd7f092894aa3397786e9c769c5348dc6");
     Coin::PublicKey pk = Coin::PublicKey::fromCompressedRaw(rawPk);
-    Coin::TransactionSignature ts(Coin::Signature::fromRawDER(rawSig), Coin::SigHashType::standard());
+    Coin::TransactionSignature ts(Coin::Signature::fromRawDER(rawSig), Coin::SigHashType::standard(Coin::Network::mainnet));
     Coin::P2PKHScriptSig sig(pk, ts);
     uchar_vector serializedP2PKHScriptSig("483045022100d5e61ab5bfd0d1450997894cb1a53e917f89d82eb43f06fa96f32c96e061aec102202fc1188e8b0dc553a2588be2b5b68dbbd7f092894aa3397786e9c769c5348dc60121030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc");
 
@@ -386,8 +386,8 @@ TEST(commonTest, P2SHMultisigScriptSig)
     uchar_vector rawSig_2("3045022100d5e61ab5bfd0d1450997894cb1a53e917f89d82eb43f06fa96f32c96e061aec102202fc1188e8b0dc553a2588be2b5b68dbbd7f092894aa3397786e9c769c5348dc6");
     uchar_vector script("00483045022100d5e61ab5bfd0d1450997894cb1a53e917f89d82eb43f06fa96f32c96e061aec102202fc1188e8b0dc553a2588be2b5b68dbbd7f092894aa3397786e9c769c5348dc601483045022100d5e61ab5bfd0d1450997894cb1a53e917f89d82eb43f06fa96f32c96e061aec102202fc1188e8b0dc553a2588be2b5b68dbbd7f092894aa3397786e9c769c5348dc601475221030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc21030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc52ae");
 
-    Coin::TransactionSignature ts_1(Coin::Signature::fromRawDER(rawSig_1), Coin::SigHashType::standard());
-    Coin::TransactionSignature ts_2(Coin::Signature::fromRawDER(rawSig_2), Coin::SigHashType::standard());
+    Coin::TransactionSignature ts_1(Coin::Signature::fromRawDER(rawSig_1), Coin::SigHashType::standard(Coin::Network::mainnet));
+    Coin::TransactionSignature ts_2(Coin::Signature::fromRawDER(rawSig_2), Coin::SigHashType::standard(Coin::Network::mainnet));
 
     Coin::PublicKey pk_1 = Coin::PublicKey::fromCompressedRaw(rawPk_1);
     Coin::PublicKey pk_2 = Coin::PublicKey::fromCompressedRaw(rawPk_2);

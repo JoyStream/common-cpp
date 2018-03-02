@@ -64,7 +64,7 @@ uchar_vector UnspentP2SHOutput::scriptPubKey() const {
 }
 
 uchar_vector UnspentP2SHOutput::sighash(const Transaction & tx, const SigHashType &sigHashType) const {
-    return ::Coin::sighash(tx, outPoint(), redeemScript(), sigHashType);
+    return sigHashType.getSigHash(tx, outPoint(), redeemScript(), value());
 }
 
 TransactionSignature UnspentP2SHOutput::transactionSignature(const Transaction & tx, const SigHashType &sigHashType) const {

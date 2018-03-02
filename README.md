@@ -3,7 +3,7 @@
 
 Common crypto C++ library building on [CoinCore](https://github.com/JoyStream/coincore-cpp)
 
-conan package name: `Common/0.1.2@joystream/stable`
+conan package name: `Common/0.2.0@joystream/stable`
 
 ### Dependencies
 

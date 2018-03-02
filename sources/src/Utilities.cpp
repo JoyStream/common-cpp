@@ -104,7 +104,7 @@ namespace Coin {
             case Network::mainnet: return mainnetAddressVersions;
             case Network::regtest: return testnet3AddressVersions;
             default:
-                    assert(false);
+                    throw std::runtime_error("unsupported network");
         }
     }
 
@@ -202,7 +202,7 @@ namespace Coin {
             offset = 5;
         }
         // OP_1 ... OP_16
-        else if(script[0] >= 0x51 || script[0] <= 0x60) {
+        else if(script[0] >= 0x51 && script[0] <= 0x60) {
             offset = 1;
             poppedData = uchar_vector(1, script[0] - 0x51 + 1);
         }else{
@@ -246,64 +246,6 @@ namespace Coin {
         }
     }
     */
-
-    uchar_vector sighash(const Transaction &tx,
-                         uint inputIndex,
-                         const uchar_vector &subscript,
-                         const SigHashType &sigHashType) {
-
-        // We only support this for now
-        if(sigHashType.type() != SigHashType::MutuallyExclusiveType::all)
-            throw std::runtime_error("unsupported sighash type, only sighash_all is supported");
-
-        if(inputIndex >= tx.inputs.size()) {
-            throw std::runtime_error("sighash: input index out of range");
-        }
-
-        // Make a copy of the transaction
-        Coin::Transaction txCopy = tx;
-
-        if(sigHashType.anyOneCanPay()) {
-            // Sign only one input
-            // https://en.bitcoin.it/wiki/OP_CHECKSIG#Procedure_for_Hashtype_SIGHASH_ANYONECANPAY
-
-            // Remove all inputs
-            txCopy.inputs.clear();
-
-            // Add input to sign as input 0
-            txCopy.inputs.push_back(tx.inputs[inputIndex]);
-
-            // Set script sig to subscript for signature
-            txCopy.inputs[0].scriptSig = subscript;
-
-        } else {
-            // Sign all inputs
-
-            // Clear all inputs scripts
-            txCopy.clearScriptSigs();
-
-            // Set script sig to subscript for signature
-            txCopy.inputs[inputIndex].scriptSig = subscript;
-        }
-
-        // Compute sighash
-        return txCopy.getHashWithAppendedCode(sigHashType.hashCode());
-    }
-
-    uchar_vector sighash(const Coin::Transaction & tx,
-                    const typesafeOutPoint &outPoint,
-                    const uchar_vector & subscript,
-                    const SigHashType & sigHashType) {
-
-        // find input index by outpoint
-        for(uint n = 0; n < tx.inputs.size(); n++) {
-            if(typesafeOutPoint(tx.inputs[n].previousOut) == outPoint) {
-                return sighash(tx, n, subscript, sigHashType);
-            }
-        }
-
-        throw std::runtime_error("sighash: transaction does not have a corresponding input");
-    }
 
     uchar_vector serializeForOP_CHECKSIGMULTISIG(const std::vector<TransactionSignature> & sigs) {
 
@@ -378,4 +320,10 @@ namespace Coin {
 
         return result;
     }
+
+    // TODO: implement this: https://en.bitcoin.it/wiki/OP_CHECKSIG#How_it_works
+    uchar_vector removeCodeSeparators(const uchar_vector& script) {
+       throw std::runtime_error("not implemented");
+    }
+
 }
