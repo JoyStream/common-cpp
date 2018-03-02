@@ -19,6 +19,9 @@ const char * nameFromNetwork(Network network) {
         case Network::mainnet: return "mainnet";
         case Network::testnet3: return "testnet3";
         case Network::regtest: return "regtest";
+        case Network::mainnet_bitcoin_cash: return "mainnet_bitcoin_cash";
+        case Network::testnet_bitcoin_cash: return "testnet_bitcoin_cash";
+        case Network::regtest_bitcoin_cash: return "regtest_bitcoin_cash";
         default:
             assert(false);
     }
@@ -34,6 +37,12 @@ Network networkFromName(const char * name) {
         return Network::testnet3;
     else if(strcmp(name, "regtest") == 0)
         return Network::regtest;
+    else if(strcmp(name, "mainnet_bitcoin_cash") == 0)
+        return Network::mainnet_bitcoin_cash;
+    else if(strcmp(name, "testnet_bitcoin_cash") == 0)
+        return Network::testnet_bitcoin_cash;
+    else if(strcmp(name, "regtest_bitcoin_cash") == 0)
+        return Network::regtest_bitcoin_cash;
     else
         throw std::runtime_error(std::string("network name unknown: ") + name);
 

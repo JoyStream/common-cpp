@@ -24,7 +24,8 @@ uchar_vector TransactionSignature::combinedSignatureAndSighashCode() const {
     uchar_vector combined;
 
     combined += _sig.rawDER();
-    combined.push_back(_type.hashCode());
+
+    combined += _type.hashCodeForScript();
 
     return combined;
 }
@@ -46,9 +47,10 @@ uchar_vector TransactionSignature::opPushForScriptSigSerialized() const {
     return serialize;
 }
 
-uint32_t TransactionSignature::maxLength() {
-    return TransactionSignature(Signature(), SigHashType()).opPushForScriptSigSerialized().size();
-}
+// Who uses this function?
+// uint32_t TransactionSignature::maxLength() {
+//     return TransactionSignature(Signature(), SigHashType()).opPushForScriptSigSerialized().size();
+// }
 
 Signature TransactionSignature::sig() const {
     return _sig;

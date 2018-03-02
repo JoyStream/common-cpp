@@ -10,7 +10,9 @@
 
 #include <common/Base58CheckEncodable.hpp> // version macroes
 #include <common/AddressType.hpp>
+#include <CoinCore/CoinNodeData.h>
 #include <stdutils/uchar_vector.h>
+#include <CoinCore/numericdata.h>
 #include <string>
 
 #define DEFAULT_SEQUENCE_NUMBER 0xFFFFFFFF
@@ -62,63 +64,13 @@ namespace Coin {
 
     uchar_vector popData(const uchar_vector & script, uchar_vector & poppedData);
 
+    uchar_vector removeCodeSeparators(const uchar_vector& script);
+
     // Deduce address network
     //Network getNetwork(std::string & base58CheckEncodedAddress);
 
     // Deduce address type
     //AddressType getType(std::string & base58CheckEncodedAddress);
-
-}
-
-
-/**
- * Signing and spending stuff
- */
-
-#include <CoinCore/CoinNodeData.h>
-//#include <CoinQ/CoinQ_script.h> // Declare CoinQ::Script::Script::type_t, is internal to class, so cannot be forward declared
-
-namespace Coin {
-
-    //enum class SigHashType;
-    class SigHashType;
-    class typesafeOutPoint;
-
-    /**
-     * MOVE INTO SIGHASHTYPE.HPP FILE
-     */
-
-    // Signature hash of type <sighahType> for transaction <tx> corresponding to input
-    // index <input> spending outpoint
-    uchar_vector sighash(const Coin::Transaction & tx,
-                    uint inputIndex,
-                    const uchar_vector & subscript,
-                    const SigHashType & sigHashType);
-
-    // Signature hash of type <sighahType> for transaction <tx> corresponding to outpoint
-    // <outPoint>
-    uchar_vector sighash(const Coin::Transaction & tx,
-                    const Coin::typesafeOutPoint & outPoint,
-                    const uchar_vector & subscript,
-                    const SigHashType & sigHashType);
-
-    /**
-    // DER encoded signature (without trailing sighash flag) corresponding to <privateKey> on input <inputToSign> of transaction <tx>.
-    // All scriptSigs in <tx> are irrelevant to resulting signature, and might as well be empty
-    secure_bytes_t createSignature(const Coin::Transaction & tx,
-                                   uint inputToSign,
-                                   const CoinQ::Script::Script & inputScriptBuilder,
-                                   const uchar_vector & privateKey);
-
-    // Whether DER encoded signature <signature> (without trailing sighash flag) is a valid SIGHASH_ALL signature for public key <publicKey> on input <inputToCheck> of transaction <tx>
-    // All scriptSigs in <tx> are irrelevant to resulting signature, and might as well be empty
-    bool verifySignature(const Coin::Transaction & tx,
-                         uint inputToCheck,
-                         const CoinQ::Script::Script & inputScriptBuilder,
-                         const secure_bytes_t & signature,
-                         const bytes_t & publicKey);
-
-    */
 
     // Turns into raw: OP_0 ...signatures...
     // which is used for both p2sh and regular mofn scriptSig

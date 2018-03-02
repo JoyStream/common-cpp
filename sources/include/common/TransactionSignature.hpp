@@ -29,7 +29,7 @@ public:
     uchar_vector opPushForScriptSigSerialized() const;
 
     // Greatest possible length of a serialized transaction signature
-    static uint32_t maxLength();
+    // static uint32_t maxLength(); // who uses this ?
 
     // Getters and setters
     Signature sig() const;
@@ -52,4 +52,3 @@ private:
 }
 
 #endif // TRANSACTION_SIGNATURE_HPP
-

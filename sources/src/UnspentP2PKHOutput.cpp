@@ -45,7 +45,7 @@ uchar_vector UnspentP2PKHOutput::scriptPubKey() const {
 }
 
 uchar_vector UnspentP2PKHOutput::sighash(const Transaction & tx, const SigHashType &sigHashType) const {
-    return ::Coin::sighash(tx, outPoint(), scriptPubKey(), sigHashType);
+    return sigHashType.getSigHash(tx, outPoint(), scriptPubKey(), value());
 }
 
 TransactionSignature UnspentP2PKHOutput::transactionSignature(const Transaction & tx, const SigHashType &sigHashType) const {
